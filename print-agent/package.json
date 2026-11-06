@@ -1,0 +1,19 @@
+{
+  "name": "eric-burger-print-agent",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agente que roda no computador da loja: busca pedidos novos no backend e manda pra impressora térmica.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "esbuild src/index.js --bundle --platform=node --format=cjs --outfile=dist/agente.cjs",
+    "build:exe": "npm run build && pkg dist/agente.cjs --targets node22-win-x64 --output dist/agente-de-impressao.exe"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "^6.22.0",
+    "esbuild": "^0.28.2"
+  }
+}

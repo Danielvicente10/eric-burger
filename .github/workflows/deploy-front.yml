@@ -1,0 +1,65 @@
+# Publica só o front-end (React/Vite) no GitHub Pages a cada push na main.
+# O backend e o agente de impressão não entram aqui.
+#
+# Antes do primeiro deploy: no repositório, Settings > Pages > Source =
+# "GitHub Actions".
+#
+# Este deploy é uma PRÉVIA para mostrar o site: sem backend configurado
+# (VITE_API_URL), dá pra navegar, montar o pedido e ver a sacola, mas o
+# envio final falha. Quando o backend estiver no ar, crie em Settings >
+# Secrets and variables > Actions > Variables a variável VITE_API_URL com a
+# URL dele, e tire o VITE_SEMPRE_ABERTO abaixo.
+
+name: Deploy do front no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # "npm install" e não "npm ci": o package-lock.json é gerado no
+      # Windows e o "npm ci" pode recusar diferenças de plataforma.
+      - run: npm install
+
+      # O site fica em https://<usuario>.github.io/<repositorio>/, por isso
+      # o --base com o nome do repositório.
+      - run: npm run build -- --base=/${{ github.event.repository.name }}/
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          # Prévia: ignora o horário de funcionamento pra dar pra testar a
+          # qualquer hora. Remova quando for o site de verdade.
+          VITE_SEMPRE_ABERTO: 'true'
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

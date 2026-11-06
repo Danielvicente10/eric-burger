@@ -1,0 +1,65 @@
+# Configuração do deploy do backend no Render (Blueprint).
+#
+# Com este arquivo no repositório, o Render monta o serviço sozinho: em
+# render.com, "New +" > "Blueprint" > escolher este repositório. Ele lê tudo
+# daqui e só pergunta os valores marcados como "sync: false" (os segredos,
+# que de propósito NÃO ficam versionados).
+#
+# O front fica na Cloudflare Pages — este arquivo é só do backend.
+
+services:
+  - type: web
+    name: eric-burger-api
+    runtime: node
+    plan: free
+    # O banco (Neon) está em us-east-1; virginia é a região do Render mais
+    # próxima, o que reduz a latência de cada consulta.
+    region: virginia
+    rootDir: backend
+
+    # "prisma generate" precisa rodar aqui: o Prisma Client é gerado dentro
+    # de node_modules, que o Render reconstrói do zero a cada deploy.
+    #
+    # É "npm install" e não "npm ci" de propósito. O package-lock.json é
+    # gerado no Windows, e o npm grava nele a forma da árvore daquele
+    # sistema: o @emnapi/core e o @emnapi/runtime (dependências do binário
+    # wasm do unrs-resolver, que vem do jest) ficam aninhados dentro de
+    # node_modules/@unrs/resolver-binding-wasm32-wasi/node_modules/. No
+    # Linux o npm monta a árvore com esses dois no topo, não bate com o
+    # lockfile, e o "npm ci" — que exige correspondência exata — aborta com
+    # "Missing: @emnapi/core from lock file". O "npm install" parte do
+    # mesmo lockfile e respeita as versões travadas nele; só ajusta o que o
+    # sistema operacional exige. Trocar isso de volta quebra o deploy.
+    buildCommand: npm install && npm run build
+
+    # "prisma migrate deploy" aplica as migrations pendentes antes de subir
+    # o servidor. É idempotente — se não houver nada pendente, não faz nada.
+    startCommand: npm run start:prod
+
+    healthCheckPath: /health
+
+    envVars:
+      # sync: false = o Render pergunta o valor na hora de criar o serviço e
+      # guarda criptografado. Nunca fica no repositório.
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: PRINT_AGENT_API_KEY
+        sync: false
+      # URL do front (ex: https://eric-burger.pages.dev).
+      # É o que libera o site no CORS — sem isso, ou com valor errado, o
+      # site carrega mas nenhum pedido passa. Se o projeto na Vercel
+      # responder por mais de um domínio, liste todos separados por
+      # vírgula, sem espaço depois dela.
+      - key: FRONTEND_URL
+        sync: false
+      # NECESSÁRIO aqui, apesar de o código funcionar sem ele. Sem token, a
+      # cota da AwesomeAPI (consulta de CEP, base do cálculo de frete) é
+      # contada por IP — e o IP de saída do Render é compartilhado com
+      # outros serviços, então ele chega saturado: a resposta é HTTP 429 já
+      # na primeira consulta. Com token a contagem passa pra chave (100 mil
+      # consultas/mês, gratuito, em awesomeapi.com.br). Em branco, nenhuma
+      # entrega consegue ser calculada.
+      - key: AWESOMEAPI_TOKEN
+        sync: false

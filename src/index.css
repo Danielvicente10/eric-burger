@@ -1,0 +1,973 @@
+:root {
+  --vermelho: #D7141D;        /* vermelho do logo e do cardápio da Eric Burger */
+  --amarelo: #FFC21A;         /* amarelo dos títulos e preços do cardápio */
+  --vermelho-escuro: #A50E17;
+  --vermelho-suave: #2E1A10;  /* fundo sutil para ícones/destaques no tema escuro */
+  --preto: #121010;           /* fundo geral, preto levemente quente */
+  --preto-cartao: #1C1817;    /* fundo dos cartões */
+  --preto-cartao-alt: #221D1C;
+  --branco: #FFFFFF;
+  --texto: #F5EFEE;
+  --texto-suave: #B8ADAB;
+  --linha: #332C2A;
+}
+
+* { box-sizing: border-box; }
+
+input, button, select, textarea {
+  min-width: 0;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--preto);
+  color: var(--texto);
+  font-family: 'Sora', sans-serif;
+}
+
+img, svg {
+  max-width: 100%;
+  display: block;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Lilita One', 'Sora', sans-serif;
+  font-weight: 400;
+  margin: 0;
+}
+
+button {
+  font-family: 'Sora', sans-serif;
+}
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--preto);
+  padding-bottom: 5.5rem; /* espaço para a barra fixa da sacola */
+}
+
+/* Cabeçalho vermelho com o logo redondo, como a capa do cardápio */
+.topo {
+  background: var(--vermelho);
+  color: var(--branco);
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+
+.topo-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.topo-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.topo-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--preto);
+  flex-shrink: 0;
+}
+
+.topo h1 {
+  font-size: 1.75rem;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  min-width: 0;
+}
+
+.topo-status {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.bolinha-status {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6FD98A;
+  display: inline-block;
+}
+
+.topo p {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Selo de tradição, entre o nome e a chamada do WhatsApp.
+   O seletor precisa dos dois níveis (.topo .topo-tradicao) pra vencer o
+   ".topo p" acima — sem isso o tamanho e a margem de lá prevaleceriam,
+   porque ".topo p" tem especificidade maior que uma classe sozinha. */
+.topo .topo-tradicao {
+  margin-top: 0.3rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--amarelo);
+}
+
+.conteudo {
+  padding: 1.25rem 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Busca */
+.cardapio-busca {
+  position: relative;
+  margin-bottom: 0.85rem;
+}
+
+.icone-busca {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+.busca-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem 0.7rem 2.2rem;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.95rem;
+  background: var(--preto-cartao);
+  color: var(--texto);
+}
+
+.busca-input::placeholder { color: var(--texto-suave); }
+
+.busca-input:focus {
+  outline: 2px solid var(--vermelho);
+  outline-offset: 1px;
+}
+
+/* Chips de categoria */
+.chips-categoria {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.9rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Edge legado */
+}
+
+.chips-categoria::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge Chromium */
+}
+
+.chip {
+  flex-shrink: 0;
+  border: 1px solid var(--linha);
+  background: var(--preto-cartao);
+  color: var(--texto-suave);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip.ativo {
+  background: var(--vermelho);
+  border-color: var(--vermelho);
+  color: var(--branco);
+}
+
+.aviso-bebidas {
+  background: var(--vermelho-suave);
+  border: 1px solid var(--vermelho-escuro);
+  color: var(--texto);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+/* Grupos do cardápio */
+.grupo-cardapio {
+  margin-bottom: 1.4rem;
+}
+
+/* Amarelo em fonte encorpada, como os títulos de seção do cardápio impresso */
+.grupo-titulo {
+  color: var(--amarelo);
+  font-size: 1.3rem;
+  font-family: 'Lilita One', 'Sora', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.7rem;
+  border-bottom: 2px solid var(--vermelho);
+}
+
+/* Cards de item */
+.lista-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.card-item {
+  background: var(--preto-cartao);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.card-item:hover { border-color: var(--vermelho); }
+
+.card-item-icone {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--vermelho-suave);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.icone-item {
+  width: 34px;
+  height: 34px;
+  display: block;
+}
+
+.card-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-item-info h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  color: var(--texto);
+}
+
+.card-item-info p {
+  margin: 0.2rem 0 0.4rem;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.precos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--amarelo);
+}
+
+.btn-adicionar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--vermelho);
+  color: var(--branco);
+  border: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-adicionar:hover { background: var(--vermelho-escuro); }
+.btn-adicionar:focus-visible { outline: 2px solid var(--vermelho-escuro); outline-offset: 2px; }
+
+.sem-resultado { color: var(--texto-suave); font-size: 0.9rem; }
+
+/* Sacola / checkout */
+.sacola, .formulario-pedido, .checkout, .resumo-final {
+  background: var(--preto-cartao);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  padding: 1.1rem;
+}
+
+.checkout { background: none; border: none; padding: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+
+.sacola-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.sacola h2, .formulario-pedido h2, .checkout h2, .resumo-final h3 {
+  font-size: 1.15rem;
+}
+
+.link-continuar {
+  background: none;
+  border: none;
+  color: var(--vermelho);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sacola-vazia { color: var(--texto-suave); font-size: 0.9rem; }
+
+.item-carrinho {
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 0.8rem;
+  margin-bottom: 0.7rem;
+  background: var(--preto-cartao-alt);
+}
+
+.item-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.item-topo h4 {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: break-word;
+  color: var(--texto);
+}
+
+.btn-remover {
+  background: none;
+  border: none;
+  color: var(--vermelho);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.item-detalhe {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.item-observacao { font-style: italic; }
+
+.item-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.item-preco-unitario {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+
+.item-rodape-acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-editar {
+  background: none;
+  border: 1px solid var(--linha);
+  color: var(--texto);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-editar:hover { border-color: var(--vermelho); color: var(--vermelho); }
+
+.quantidade-controle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.quantidade-controle button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--linha);
+  background: var(--preto-cartao-alt);
+  color: var(--texto);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.carrinho-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.05rem;
+  padding-top: 0.7rem;
+  margin-top: 0.3rem;
+  border-top: 1px solid var(--linha);
+  color: var(--texto);
+}
+
+/* Dica curta ao lado do rótulo de um campo do formulário */
+.campo-dica {
+  font-weight: 400;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Linhas de subtotal/taxa de entrega, antes do total final */
+.carrinho-total-linha {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--texto-suave, var(--texto));
+}
+
+.btn-largo { width: 100%; margin-top: 1rem; }
+
+/* Aviso de loja fechada, no rodapé do modal do produto. */
+.aviso-fechado {
+  margin: 0 0 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(214, 40, 40, 0.12);
+  border: 1px solid rgba(214, 40, 40, 0.35);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--texto);
+  text-align: center;
+}
+
+/* Sem isto o botão desabilitado continua com a cara de clicável. */
+.btn-primario:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Bloco de troco — só aparece quando o pagamento é em dinheiro. */
+.bloco-troco {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--linha);
+}
+
+.campo-troco { margin-top: 0.75rem; }
+
+/* Prefixo "R$" colado ao campo, pra pessoa digitar só os números. */
+.campo-prefixado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--preto-campo, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  padding: 0 0.75rem;
+}
+
+.campo-prefixado span {
+  font-weight: 700;
+  color: var(--texto-suave, var(--texto));
+  flex-shrink: 0;
+}
+
+/* Os dois seletores abaixo precisam do ".campo" na frente pra vencer o
+   ".campo input" definido mais adiante neste arquivo: mesma especificidade
+   perde por ordem, e o input voltava a ganhar borda e fundo próprios —
+   aparecendo uma caixa dentro da outra, com contorno de foco duplicado. */
+.campo .campo-prefixado input {
+  background: none;
+  border: none;
+  padding: 0.7rem 0;
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  color: inherit;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
+}
+
+.campo .campo-prefixado input:focus { outline: none; }
+
+.campo-prefixado:focus-within {
+  border-color: var(--vermelho);
+  outline: 2px solid var(--vermelho);
+  outline-offset: 1px;
+}
+
+.troco-resultado,
+.troco-alerta {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+}
+
+.troco-resultado { color: var(--texto-suave, var(--texto)); }
+.troco-resultado strong { color: var(--texto); }
+.troco-alerta { color: var(--vermelho); }
+
+/* Resumo final no checkout */
+.resumo-final { display: flex; flex-direction: column; gap: 0.7rem; }
+
+.lista-resumo-final {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Estimativa de preparo, último item do resumo. Fica depois do total e
+   separada por uma linha, pra ser lida como informação do pedido e não
+   confundida com mais um valor a pagar. */
+.aviso-preparo {
+  margin: 0;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--linha);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--texto-suave, var(--texto));
+}
+
+.aviso-preparo strong {
+  color: var(--texto);
+}
+
+/* Aviso de que não trocamos ingrediente, logo acima do campo de observação.
+   Fica ali de propósito: é exatamente onde o cliente ia escrever "trocar
+   azeitona por palmito" e depois cobrar a troca no balcão. */
+.aviso-troca {
+  margin: 0 0 0.7rem;
+  padding: 0.65rem 0.8rem;
+  border-left: 3px solid var(--vermelho);
+  border-radius: 0 6px 6px 0;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--texto-suave, var(--texto));
+}
+
+.aviso-troca-titulo {
+  margin: 0 0 0.45rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--texto);
+}
+
+.aviso-troca ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.aviso-troca li {
+  padding-left: 0.9rem;
+  position: relative;
+}
+
+/* Marcador próprio em vez de bullet: fica alinhado com o texto de duas
+   linhas e não desloca a indentação no celular. */
+.aviso-troca li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--vermelho);
+}
+
+.aviso-troca strong {
+  color: var(--texto);
+}
+
+.aviso-troca em {
+  font-style: normal;
+  padding: 0 0.28rem;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.aviso-troca-nota {
+  margin: 0.5rem 0 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.resumo-final-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--texto);
+}
+
+.resumo-final-item em {
+  display: block;
+  font-style: normal;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+}
+
+/* Formulário */
+.campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.campo input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  background: var(--preto-cartao-alt);
+  color: var(--texto);
+}
+
+.campo input:focus { outline: 2px solid var(--vermelho); outline-offset: 1px; }
+
+.link-busca-cep {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--vermelho);
+  text-decoration: underline;
+}
+
+.endereco-retirada {
+  font-size: 0.9rem;
+  color: var(--texto);
+  background: var(--preto-cartao-alt);
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.linha-dupla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+@media (max-width: 340px) {
+  .linha-dupla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.opcoes-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.opcoes-toggle button {
+  border: 1px solid var(--linha);
+  background: var(--preto-cartao-alt);
+  color: var(--texto);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.opcoes-toggle button.ativo {
+  background: var(--vermelho);
+  border-color: var(--vermelho);
+  color: var(--branco);
+  font-weight: 600;
+}
+
+.mensagem-erro {
+  color: #FF6B6B;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.mensagem-info {
+  color: var(--cinza-texto, #888);
+  font-size: 0.88rem;
+}
+
+.btn-primario, .btn-enviar {
+  background: var(--vermelho);
+  color: var(--branco);
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-enviar { width: 100%; }
+
+.btn-primario:hover, .btn-enviar:hover { background: var(--vermelho-escuro); }
+
+.btn-primario:disabled, .btn-enviar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-primario:focus-visible, .btn-enviar:focus-visible { outline: 2px solid var(--vermelho-escuro); outline-offset: 2px; }
+
+/* Barra fixa da sacola */
+.barra-carrinho {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  max-width: 456px;
+  margin: 0 auto;
+  background: var(--vermelho);
+  color: var(--branco);
+  border: none;
+  border-radius: 14px;
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-family: 'Sora', sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.barra-carrinho-itens { font-size: 0.85rem; white-space: nowrap; }
+.barra-carrinho-total { font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
+
+/* Modal de personalização de produto */
+.modal-fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-caixa {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  background: var(--preto-cartao);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-bottom: none;
+}
+
+.modal-topo {
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--linha);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.modal-topo h2 {
+  font-size: 1.15rem;
+  padding-right: 2rem;
+  color: var(--texto);
+}
+
+.modal-fechar {
+  position: absolute;
+  top: 1rem;
+  right: 1.1rem;
+  background: none;
+  border: none;
+  color: var(--texto-suave);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.modal-conteudo {
+  padding: 1.1rem 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-descricao {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+.modal-secao { margin-bottom: 1.2rem; }
+
+.modal-secao h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--texto-suave);
+  margin-bottom: 0.6rem;
+  font-family: 'Sora', sans-serif;
+}
+
+.lista-acrescimos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.acrescimo {
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--texto-suave);
+}
+
+.acrescimo.marcado { color: var(--texto); font-weight: 600; }
+.acrescimo input { accent-color: var(--vermelho); width: 17px; height: 17px; }
+
+.modal-observacao {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  background: var(--preto-cartao-alt);
+  color: var(--texto);
+  font-family: 'Sora', sans-serif;
+  font-size: 0.88rem;
+  resize: vertical;
+}
+
+.modal-observacao:focus { outline: 2px solid var(--vermelho); outline-offset: 1px; }
+
+.modal-rodape {
+  padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--linha);
+  flex-shrink: 0;
+}
+
+.modal-rodape .btn-primario { width: 100%; }
+
+/* Revisão do item dentro do modal */
+.revisao-item h3 { font-size: 1.05rem; margin-bottom: 0.9rem; color: var(--texto); }
+
+.revisao-linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--texto);
+  margin: 0 0 0.6rem;
+}
+
+.revisao-acrescimos {
+  font-size: 0.88rem;
+  color: var(--texto);
+  margin-bottom: 0.6rem;
+}
+
+.revisao-acrescimos ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.revisao-acrescimos li {
+  display: flex;
+  justify-content: space-between;
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+}
+
+.revisao-total {
+  border-top: 1px solid var(--linha);
+  padding-top: 0.7rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.btn-voltar-opcoes {
+  background: none;
+  border: none;
+  color: var(--vermelho);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.4rem;
+}
+
+/* Modal de confirmação de pedido enviado */
+.modal-confirmacao { max-width: 420px; border-radius: 20px; }
+.modal-confirmacao .modal-conteudo { text-align: center; padding-top: 1.6rem; }
+.confirmacao-emoji { font-size: 2.2rem; margin: 0 0 0.6rem; }
+.modal-confirmacao h2 { margin-bottom: 0.6rem; color: var(--texto); }
+.modal-confirmacao p { color: var(--texto-suave); font-size: 0.9rem; line-height: 1.5; }
+
+@media (min-width: 640px) {
+  .app { border-left: 1px solid var(--linha); border-right: 1px solid var(--linha); }
+}

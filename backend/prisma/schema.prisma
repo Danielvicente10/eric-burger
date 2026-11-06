@@ -1,0 +1,76 @@
+// Schema do banco de dados da Eric Burger.
+// Documentação: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Connection string "pooled" (via PgBouncer) — usada em runtime pela app.
+  url       = env("DATABASE_URL")
+  // Connection string direta (sem pooling) — usada só pelo Prisma Migrate,
+  // que precisa de uma conexão de sessão normal pra rodar migrations.
+  // Em dev local (docker-compose) as duas apontam pro mesmo Postgres.
+  directUrl = env("DIRECT_URL")
+}
+
+enum TipoEntrega {
+  RETIRADA
+  ENTREGA
+}
+
+enum StatusPedido {
+  RECEBIDO
+  IMPRESSO
+  EM_PREPARO
+  PRONTO
+  ENTREGUE
+}
+
+model Pedido {
+  id            String       @id @default(cuid())
+  codigo        String       @unique
+  nomeCliente   String
+  telefone      String?
+  tipoEntrega   TipoEntrega
+  endereco      Json?
+  pagamento     String
+  status        StatusPedido @default(RECEBIDO)
+  totalCentavos Int
+  // Taxa de entrega já somada ao totalCentavos. Fica 0 pra retirada.
+  // Calculada no servidor a partir da distância até a loja — ver
+  // src/pedidos/frete/frete.service.ts.
+  taxaEntregaCentavos Int @default(0)
+  // Com quanto o cliente vai pagar, quando pediu troco em dinheiro. Null
+  // em qualquer outra forma de pagamento, ou quando disse que leva o valor
+  // certo. Guardamos o valor ENTREGUE, e não o troco calculado: o troco sai
+  // de "trocoParaCentavos - totalCentavos", sempre contra o total oficial
+  // do servidor. Se guardássemos o troco pronto, vindo do front, uma
+  // mudança de preço entre a abertura da página e a confirmação faria o
+  // cupom imprimir um valor errado.
+  trocoParaCentavos Int?
+  itens         ItemPedido[]
+  criadoEm      DateTime     @default(now())
+  atualizadoEm  DateTime     @updatedAt
+  impressoEm    DateTime?
+
+  @@index([status, criadoEm])
+}
+
+model ItemPedido {
+  id                    String  @id @default(cuid())
+  pedidoId              String
+  pedido                Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  itemCardapioId        String
+  itemNome              String
+  varianteId            String?
+  varianteNome          String?
+  precoUnitarioCentavos Int
+  acrescimos            Json
+  observacao            String?
+  quantidade            Int
+  subtotalCentavos      Int
+
+  @@index([pedidoId])
+}
